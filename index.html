@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora N&oacute;mina Completa (Con Extras/Festivos)</title>
+    <title>Calculadora N&oacute;mina Final (Vigilantes)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
@@ -18,7 +18,7 @@
             --rest-bg: #d4edda; --rest-text: #155724;
             --perm-bg: #e8daef; --perm-text: #6c3483;
             --abs-bg: #fadbd8; --abs-text: #922b21;
-            --extra-bg: #ffe0b2; --extra-text: #e65100; /* Naranja para Trabajo en Descanso */
+            --extra-bg: #ffe0b2; --extra-text: #e65100;
         }
 
         body {
@@ -39,7 +39,7 @@
         }
 
         h1 { text-align: center; color: var(--primary); margin-bottom: 5px; }
-        .badge-new { background: #e65100; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6em; vertical-align: middle; }
+        .badge-new { background: #27ae60; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6em; vertical-align: middle; }
         p.subtitle { text-align: center; color: #666; margin-bottom: 30px; }
 
         .controls-panel {
@@ -57,7 +57,13 @@
         .input-group label { font-weight: 700; font-size: 0.85em; color: var(--primary); margin-bottom: 6px; }
         .input-group input, .input-group select {
             padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-size: 1em;
+            transition: border-color 0.3s;
         }
+        .input-group input:focus, .input-group select:focus { border-color: var(--accent); outline: none; }
+
+        /* Estilo para selectores de fecha */
+        .date-selectors { display: flex; gap: 10px; }
+        .date-selectors select { flex: 1; }
 
         .btn-group { grid-column: 1 / -1; display: flex; gap: 10px; }
         button { flex: 1; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; color: white; }
@@ -115,6 +121,7 @@
         
         .rates-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .rate-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 15px; transition: transform 0.2s;}
+        .rate-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-color: var(--accent); }
         .rate-title { font-weight: bold; color: var(--primary); font-size: 1em; margin-bottom: 5px; display: flex; justify-content: space-between; }
         .rate-percentage { background: var(--info); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
         .rate-calc { font-size: 0.85em; color: #666; margin-bottom: 10px; font-style: italic; }
@@ -126,22 +133,39 @@
 <body>
 
 <div class="container">
-    <h1>Calculadora Vigilantes</h1>
-    <p class="subtitle">Incluye pago de domingos/descansos trabajados (con recargo de ley)</p>
+    <h1>Calculadora Vigilantes <span class="badge-new">PRO</span></h1>
+    <p class="subtitle">Entrada de datos mejorada, PDF y Cálculos Exactos 2026</p>
 
     <div class="controls-panel">
         <div class="input-group">
             <label>Salario B&aacute;sico ($)</label>
-            <input type="number" id="baseSalary" value="1750905" onchange="fullRecalculate()">
+            <input type="text" id="baseSalary" value="1.750.905" oninput="formatCurrency(this)" onchange="fullRecalculate()">
         </div>
         <div class="input-group">
             <label>Auxilio Transporte ($)</label>
-            <input type="number" id="transportAux" value="249095" onchange="fullRecalculate()">
+            <input type="text" id="transportAux" value="249.095" oninput="formatCurrency(this)" onchange="fullRecalculate()">
         </div>
+        
         <div class="input-group">
-            <label>Mes a Liquidar</label>
-            <input type="month" id="selectedMonth" onchange="resetAndGenerate()">
+            <label>Periodo de Pago</label>
+            <div class="date-selectors">
+                <select id="selMonth" onchange="resetAndGenerate()">
+                    <option value="1">Enero</option><option value="2">Febrero</option>
+                    <option value="3">Marzo</option><option value="4">Abril</option>
+                    <option value="5">Mayo</option><option value="6">Junio</option>
+                    <option value="7">Julio</option><option value="8">Agosto</option>
+                    <option value="9">Septiembre</option><option value="10">Octubre</option>
+                    <option value="11">Noviembre</option><option value="12">Diciembre</option>
+                </select>
+                <select id="selYear" onchange="resetAndGenerate()">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                </select>
+            </div>
         </div>
+
         <div class="input-group">
             <label>Patr&oacute;n</label>
             <select id="shiftPattern">
@@ -214,9 +238,8 @@
                 <div class="rate-title">Extra Nocturna <span class="rate-percentage">1.75x</span></div>
                 <div class="rate-value" id="rate-ext-noc">$ 0</div>
             </div>
-            <div class="rate-card" style="border: 2px solid #e65100;">
+            <div class="rate-card">
                 <div class="rate-title">Extra/Dominical <span class="rate-percentage" style="background:#e65100;">1.8x / 1.9x</span></div>
-                <div class="rate-calc">Trabajo en día de descanso</div>
                 <div class="rate-value" id="rate-rec-dom">$ 0</div>
             </div>
              <div class="rate-card">
@@ -232,24 +255,40 @@
 </div>
 
 <script>
-    // --- LÓGICA DE DIVISOR ---
+    // --- UTILIDADES ---
+    function formatCurrency(input) {
+        // Eliminar no numéricos
+        let value = input.value.replace(/\D/g, '');
+        // Formatear
+        if(value !== '') {
+            input.value = new Intl.NumberFormat('es-CO').format(value);
+        }
+    }
+
+    function getRawMoney(elementId) {
+        const val = document.getElementById(elementId).value;
+        return parseInt(val.replace(/\./g, '')) || 0;
+    }
+
+    // --- INICIALIZACIÓN ---
+    const today = new Date();
+    document.getElementById('selMonth').value = today.getMonth() + 1;
+    document.getElementById('selYear').value = today.getFullYear();
+    document.getElementById('cycleStartDate').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+
+    // --- LÓGICA DE CÁLCULO ---
     function getDivisorForDate(year, month, day) {
         const current = new Date(year, month - 1, day).getTime();
         const transition = new Date(2026, 6, 15).getTime(); 
         return (current >= transition) ? 210 : 220;
     }
 
-    // --- LÓGICA DE RECARGO FESTIVO ---
     function getFestiveSurcharge(year, month, day) {
         const current = new Date(year, month - 1, day).getTime();
-        const transition2026 = new Date(2026, 6, 1).getTime(); // 1 Julio 2026 sube al 90%
-        
-        // Antes de Julio 2026: 80% (0.8)
-        // Desde Julio 2026: 90% (0.9)
+        const transition2026 = new Date(2026, 6, 1).getTime(); 
         return (current >= transition2026) ? 0.90 : 0.80;
     }
 
-    // --- CONFIGURACIÓN ---
     const patterns = {
         '2D2N2X': ['D', 'D', 'N', 'N', 'X', 'X'],
         '4D2X': ['D', 'D', 'D', 'D', 'X', 'X'],
@@ -258,39 +297,35 @@
     };
 
     let dayStates = [];
-    // SECUENCIA ACTUALIZADA: D -> N -> X -> E (Extra/Descanso Trab) -> P -> A
     const nextState = { 'D': 'N', 'N': 'X', 'X': 'E', 'E': 'P', 'P': 'A', 'A': 'D' };
     
     const stateConfig = {
         'D': { label: 'Diurno', class: 'cell-diurno' },
         'N': { label: 'Nocturno', class: 'cell-nocturno' },
         'X': { label: 'Descanso', class: 'cell-descanso' },
-        'E': { label: 'Trab. Descanso', class: 'cell-extra' }, // Nuevo
+        'E': { label: 'Extra/Fest', class: 'cell-extra' },
         'P': { label: 'Permiso', class: 'cell-permiso' },
         'A': { label: 'Ausencia', class: 'cell-ausencia' }
     };
-
-    const today = new Date();
-    document.getElementById('selectedMonth').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-    document.getElementById('cycleStartDate').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
 
     resetAndGenerate();
 
     function fullRecalculate() {
         updateEducationalTable();
         recalculate();
-        const [year, month] = document.getElementById('selectedMonth').value.split('-').map(Number);
+        const year = parseInt(document.getElementById('selYear').value);
+        const month = parseInt(document.getElementById('selMonth').value);
         renderGrid(year, month);
     }
 
     function resetAndGenerate() {
-        const monthInput = document.getElementById('selectedMonth').value;
+        const year = parseInt(document.getElementById('selYear').value);
+        const month = parseInt(document.getElementById('selMonth').value);
         const patternKey = document.getElementById('shiftPattern').value;
         const cycleStartInput = document.getElementById('cycleStartDate').value;
         
-        if (!monthInput || !cycleStartInput) return;
+        if (!cycleStartInput) return;
 
-        const [year, month] = monthInput.split('-').map(Number);
         const cycleStartDate = new Date(cycleStartInput + 'T00:00:00');
         const daysInMonth = new Date(year, month, 0).getDate();
         
@@ -351,10 +386,10 @@
     }
 
     function calculateDayComponents(type, year, month, day) {
-        const salary = parseFloat(document.getElementById('baseSalary').value) || 0;
+        const salary = getRawMoney('baseSalary');
         const divisor = getDivisorForDate(year, month, day);
         const hourValue = Math.round(salary / divisor);
-        const festSurcharge = getFestiveSurcharge(year, month, day); // 0.80 o 0.90
+        const festSurcharge = getFestiveSurcharge(year, month, day);
 
         let total = 0;
         let details = { basic: 0, recargo: 0, extra: 0 };
@@ -374,25 +409,17 @@
                 details.extra = 4 * hourValue * 1.25;
                 break;
             case 'N': // Nocturno
-                // 1h Diurna + 7h Nocturna (1.35) + 4h Extra Noct (1.75)
                 details.basic = (1 * hourValue) + (7 * hourValue);
                 details.recargo = (7 * hourValue * 0.35);
                 details.extra = (4 * hourValue * 1.75);
                 total = details.basic + details.recargo + details.extra;
                 break;
-            case 'E': // TRABAJO EN DESCANSO (FESTIVO) - 12H Diurno Asumido
-                // 8h con recargo festivo (1 + recargo)
-                // 4h extras festivas diurnas (1 + recargo + 0.25) = (1.25 + recargo)
-                // Ej 2026 Sem 1: 8h al 1.8 + 4h al 2.05 (1.25 + 0.80)
-                
+            case 'E': // Extra/Festivo
                 const valBaseFest = 8 * hourValue * (1 + festSurcharge);
                 const valExtraFest = 4 * hourValue * (1.25 + festSurcharge);
-                
                 total = valBaseFest + valExtraFest;
-                
-                details.basic = 8 * hourValue; // Base pura
-                details.recargo = (8 * hourValue * festSurcharge); // El recargo de las 8h
-                // Las extras las sumamos completas al rubro extras para el reporte
+                details.basic = 8 * hourValue;
+                details.recargo = (8 * hourValue * festSurcharge);
                 details.extra = valExtraFest; 
                 break;
         }
@@ -401,8 +428,8 @@
     }
 
     function recalculate() {
-        const monthInput = document.getElementById('selectedMonth').value;
-        const [year, month] = monthInput.split('-').map(Number);
+        const year = parseInt(document.getElementById('selYear').value);
+        const month = parseInt(document.getElementById('selMonth').value);
         
         let grandTotal = 0;
 
@@ -411,7 +438,7 @@
             grandTotal += comps.total;
         }
 
-        const auxTransporte = parseFloat(document.getElementById('transportAux').value) || 0;
+        const auxTransporte = getRawMoney('transportAux');
         const ibc = grandTotal;
         const salud = Math.round(ibc * 0.04);
         const pension = Math.round(ibc * 0.04);
@@ -428,9 +455,9 @@
     }
 
     function updateEducationalTable() {
-        const salary = parseFloat(document.getElementById('baseSalary').value) || 0;
-        const monthInput = document.getElementById('selectedMonth').value;
-        const [year, month] = monthInput.split('-').map(Number);
+        const salary = getRawMoney('baseSalary');
+        const year = parseInt(document.getElementById('selYear').value);
+        const month = parseInt(document.getElementById('selMonth').value);
         const divisorRef = getDivisorForDate(year, month, 1);
         const hourVal = Math.round(salary / divisorRef); 
         const festPct = getFestiveSurcharge(year, month, 1);
@@ -441,7 +468,6 @@
         document.getElementById('rate-ext-diu').innerText = formatMoney(hourVal * 1.25);
         document.getElementById('rate-ext-noc').innerText = formatMoney(hourVal * 1.75);
         
-        // Dinámicos según fecha
         document.getElementById('rate-rec-dom').innerText = formatMoney(hourVal * (1 + festPct));
         document.getElementById('rate-ext-dom-diu').innerText = formatMoney(hourVal * (1.25 + festPct));
         document.getElementById('rate-ext-dom-noc').innerText = formatMoney(hourVal * (1.75 + festPct));
@@ -451,14 +477,15 @@
         recalculate(); 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const monthInput = document.getElementById('selectedMonth').value;
-        const [year, month] = monthInput.split('-').map(Number);
-        const salary = document.getElementById('baseSalary').value;
+        
+        const year = document.getElementById('selYear').value;
+        const month = document.getElementById('selMonth').options[document.getElementById('selMonth').selectedIndex].text;
+        const salary = document.getElementById('baseSalary').value; // Ya viene formateado
 
         doc.setFontSize(18);
         doc.text("Volante de N\u00F3mina", 105, 15, null, null, "center");
         doc.setFontSize(10);
-        doc.text(`Periodo: ${monthInput} | Salario Base: ${formatMoney(salary)}`, 105, 22, null, null, "center");
+        doc.text(`Periodo: ${month} ${year} | Salario Base: $${salary}`, 105, 22, null, null, "center");
 
         const totalTurnos = document.getElementById('valTotalTurnos').innerText;
         const auxTrans = document.getElementById('valTransporte').innerText;
@@ -476,11 +503,7 @@
                 ['Auxilio de Transporte', auxTrans, ''],
                 ['Aporte Salud (4%)', '', salud],
                 ['Aporte Pensi\u00F3n (4%)', '', pension],
-                [
-                    {content: 'TOTALES', styles: {fontStyle: 'bold', fillColor: [240, 240, 240]}}, 
-                    {content: totalDev, styles: {fontStyle: 'bold', fillColor: [240, 240, 240], halign: 'right'}}, 
-                    {content: totalDed, styles: {fontStyle: 'bold', fillColor: [240, 240, 240], halign: 'right'}}
-                ],
+                ['TOTALES', totalDev, totalDed],
                 [{content: 'NETO A PAGAR: ' + neto, colSpan: 3, styles: {halign: 'center', fontSize: 14, fillColor: [44, 62, 80], textColor: 255}}]
             ],
             theme: 'grid',
@@ -489,12 +512,15 @@
         });
 
         let rows = [];
-        const stateLabels = { 'D': 'Diurno', 'N': 'Nocturno', 'X': 'Descanso', 'E': 'Trab. Extra', 'P': 'Permiso', 'A': 'Ausencia' };
+        const stateLabels = { 'D': 'Diurno', 'N': 'Nocturno', 'X': 'Descanso', 'E': 'Extra/Fest', 'P': 'Permiso', 'A': 'Ausencia' };
         
+        const yrInt = parseInt(year);
+        const moInt = parseInt(document.getElementById('selMonth').value);
+
         for (let day = 1; day < dayStates.length; day++) {
             const state = dayStates[day];
-            const divisor = getDivisorForDate(year, month, day);
-            const comps = calculateDayComponents(state, year, month, day);
+            const divisor = getDivisorForDate(yrInt, moInt, day);
+            const comps = calculateDayComponents(state, yrInt, moInt, day);
             
             rows.push([
                 day,
@@ -519,7 +545,7 @@
             columnStyles: { 0: { halign: 'center' }, 1: { halign: 'left' } }
         });
 
-        doc.save(`Nomina_Final_${monthInput}.pdf`);
+        doc.save(`Nomina_${month}_${year}.pdf`);
     }
 
     function formatMoney(num) { 
