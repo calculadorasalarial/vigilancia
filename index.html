@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora N&oacute;mina Final (Vigilantes)</title>
+    <title>Calculadora N&oacute;mina Pro (Navegaci&oacute;n)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
@@ -39,9 +39,10 @@
         }
 
         h1 { text-align: center; color: var(--primary); margin-bottom: 5px; }
-        .badge-new { background: #27ae60; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6em; vertical-align: middle; }
+        .badge-new { background: #2980b9; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6em; vertical-align: middle; }
         p.subtitle { text-align: center; color: #666; margin-bottom: 30px; }
 
+        /* --- Panel de Control --- */
         .controls-panel {
             background: #eef2f6;
             padding: 25px;
@@ -59,9 +60,6 @@
             padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-size: 1em;
             transition: border-color 0.3s;
         }
-        .input-group input:focus, .input-group select:focus { border-color: var(--accent); outline: none; }
-
-        /* Estilo para selectores de fecha */
         .date-selectors { display: flex; gap: 10px; }
         .date-selectors select { flex: 1; }
 
@@ -72,7 +70,7 @@
         .btn-pdf { background-color: #c0392b; }
         .btn-pdf:hover { background-color: #a93226; }
 
-        /* Calendario */
+        /* --- Calendario --- */
         .calendar-wrapper { margin-bottom: 40px; overflow-x: auto; }
         .calendar-header {
             display: grid; grid-template-columns: repeat(7, minmax(50px, 1fr));
@@ -85,8 +83,9 @@
         .day-cell {
             min-height: 100px; border-right: 1px solid #eee; border-bottom: 1px solid #eee;
             padding: 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform 0.1s;
         }
-        .day-cell:hover { background-color: #fdfdfd; box-shadow: inset 0 0 0 2px var(--accent); }
+        .day-cell:hover { transform: scale(1.02); box-shadow: 0 0 10px rgba(0,0,0,0.1); z-index: 5; }
         .day-cell.empty { background: #f8f9fa; cursor: default; }
 
         /* Estados */
@@ -102,7 +101,7 @@
         .day-label { font-size: 0.7em; text-align: center; font-weight: bold; text-transform: uppercase; }
         .day-money { font-size: 0.85em; text-align: right; font-weight: 700; }
 
-        /* Resultados */
+        /* --- Resultados --- */
         .financial-summary {
             display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
             background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 30px; margin-bottom: 40px;
@@ -113,18 +112,59 @@
         .final-pay { grid-column: 1 / -1; background: var(--primary); color: #fff; text-align: center; padding: 25px; border-radius: 10px; }
         .final-pay h2 { margin: 5px 0 0 0; font-size: 2.5em; }
 
+        /* --- MODAL --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Encabezado del Modal con Navegación */
+        .modal-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; 
+        }
+        
+        .modal-nav-container {
+            display: flex; align-items: center; gap: 15px; flex: 1;
+        }
+        
+        .modal-header h2 { margin: 0; color: var(--primary); font-size: 1.3em; text-align: center; min-width: 180px; }
+        
+        .nav-btn {
+            background: #f1f1f1; color: #555; border: none; width: 35px; height: 35px; border-radius: 50%;
+            font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; padding: 0;
+        }
+        .nav-btn:hover { background: #e0e0e0; color: #000; }
+        
+        .close-btn { 
+            background: none; border: none; font-size: 2em; cursor: pointer; color: #aaa; line-height: 1; padding: 0; margin-left: 10px;
+        }
+        .close-btn:hover { color: #333; }
+        
+        .modal-body select { width: 100%; padding: 10px; font-size: 1em; margin-bottom: 20px; border: 2px solid var(--accent); border-radius: 6px; }
+        
+        .detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .detail-table th, .detail-table td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        .detail-table th { background-color: #f8f9fa; color: #666; font-size: 0.9em; }
+        .detail-table td.amount { text-align: right; font-weight: bold; }
+        .detail-row-total { background-color: var(--primary); color: white; font-weight: bold; }
+        .detail-row-total td { border: none; }
+
+        .info-pill { background: #e3f2fd; color: #0d47a1; padding: 5px 10px; border-radius: 15px; font-size: 0.85em; display: inline-block; margin-bottom: 15px; }
+
         /* Guía Detallada */
+		.formula-box { background: #fff8e1; color: #856404; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9em; text-align: center; border: 1px solid #ffeeba; }
         .education-section { background-color: #fff; border-radius: 12px; padding: 25px; border: 1px solid #e0e0e0; }
         .education-header { text-align: center; margin-bottom: 20px; }
-        .education-header h2 { color: var(--info); margin: 0; }
-        .formula-box { background: #fff8e1; color: #856404; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9em; text-align: center; border: 1px solid #ffeeba; }
-        
         .rates-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .rate-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 15px; transition: transform 0.2s;}
-        .rate-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-color: var(--accent); }
-        .rate-title { font-weight: bold; color: var(--primary); font-size: 1em; margin-bottom: 5px; display: flex; justify-content: space-between; }
-        .rate-percentage { background: var(--info); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
-        .rate-calc { font-size: 0.85em; color: #666; margin-bottom: 10px; font-style: italic; }
+        .rate-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 15px; }
+        .rate-title { font-weight: bold; color: var(--primary); font-size: 1em; display: flex; justify-content: space-between; }
         .rate-value { font-size: 1.3em; font-weight: bold; color: var(--accent); text-align: right; }
         
         @media (max-width: 768px) { .financial-summary { grid-template-columns: 1fr; } }
@@ -133,8 +173,8 @@
 <body>
 
 <div class="container">
-    <h1>Calculadora Vigilantes <span class="badge-new">PRO</span></h1>
-    <p class="subtitle">Entrada de datos mejorada, PDF y Cálculos Exactos 2026</p>
+    <h1>Calculadora Vigilantes</h1>
+    <p class="subtitle">Navegaci&oacute;n entre d&iacute;as, Modal Completo y PDF</p>
 
     <div class="controls-panel">
         <div class="input-group">
@@ -167,7 +207,7 @@
         </div>
 
         <div class="input-group">
-            <label>Patr&oacute;n</label>
+            <label>Patr&oacute;n Inicial</label>
             <select id="shiftPattern">
                 <option value="2D2N2X">2x2x2 (Rotativo)</option>
                 <option value="4D2X">4x2 Diurno</option>
@@ -254,12 +294,50 @@
     </div>
 </div>
 
+<div id="dayModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-nav-container">
+                <button class="nav-btn" onclick="changeModalDay(-1)" title="Día Anterior">❮</button>
+                <h2 id="modalDateTitle">...</h2>
+                <button class="nav-btn" onclick="changeModalDay(1)" title="Siguiente Día">❯</button>
+            </div>
+            <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <span id="modalLawInfo" class="info-pill">Divisor 220h | Hora: $7.959</span>
+            
+            <label for="modalShiftSelector" style="font-weight:bold; display:block; margin-bottom:5px;">Seleccionar Turno:</label>
+            <select id="modalShiftSelector" onchange="updateDayFromModal()">
+                <option value="D">☀️ Diurno (12h)</option>
+                <option value="N">🌑 Nocturno (12h)</option>
+                <option value="X">🟢 Descanso</option>
+                <option value="E">🟠 Extra/Festivo (Trabajo en Descanso)</option>
+                <option value="P">🟣 Permiso Remunerado</option>
+                <option value="A">🔴 Ausencia No Justificada</option>
+            </select>
+
+            <table class="detail-table">
+                <thead>
+                    <tr><th>Concepto</th><th>Cálculo</th><th>Valor</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Básico</td><td id="tdBasicDesc">-</td><td class="amount" id="tdBasicVal">$ 0</td></tr>
+                    <tr><td>Recargos</td><td id="tdRecDesc">-</td><td class="amount" id="tdRecVal">$ 0</td></tr>
+                    <tr><td>Extras</td><td id="tdExtDesc">-</td><td class="amount" id="tdExtVal">$ 0</td></tr>
+                    <tr class="detail-row-total"><td>TOTAL DÍA</td><td></td><td class="amount" id="tdTotalVal">$ 0</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script>
+    let currentSelectedDay = null; // Día actualmente visible en el modal
+
     // --- UTILIDADES ---
     function formatCurrency(input) {
-        // Eliminar no numéricos
         let value = input.value.replace(/\D/g, '');
-        // Formatear
         if(value !== '') {
             input.value = new Intl.NumberFormat('es-CO').format(value);
         }
@@ -270,13 +348,18 @@
         return parseInt(val.replace(/\./g, '')) || 0;
     }
 
+    function formatMoney(num) { 
+        if(typeof num === 'string') return num;
+        return '$ ' + Math.round(num).toLocaleString('es-CO'); 
+    }
+
     // --- INICIALIZACIÓN ---
     const today = new Date();
     document.getElementById('selMonth').value = today.getMonth() + 1;
     document.getElementById('selYear').value = today.getFullYear();
     document.getElementById('cycleStartDate').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
 
-    // --- LÓGICA DE CÁLCULO ---
+    // --- LÓGICA CORE ---
     function getDivisorForDate(year, month, day) {
         const current = new Date(year, month - 1, day).getTime();
         const transition = new Date(2026, 6, 15).getTime(); 
@@ -297,8 +380,6 @@
     };
 
     let dayStates = [];
-    const nextState = { 'D': 'N', 'N': 'X', 'X': 'E', 'E': 'P', 'P': 'A', 'A': 'D' };
-    
     const stateConfig = {
         'D': { label: 'Diurno', class: 'cell-diurno' },
         'N': { label: 'Nocturno', class: 'cell-nocturno' },
@@ -369,7 +450,7 @@
             const cellVals = calculateDayComponents(state, year, month, day); 
 
             cell.className = `day-cell ${config.class}`;
-            cell.onclick = () => toggleDay(day);
+            cell.onclick = () => openModal(day);
 
             cell.innerHTML = `
                 <div class="day-number">${day} <span class="rate-indicator">${divisor}h</span></div>
@@ -380,11 +461,91 @@
         }
     }
 
-    function toggleDay(day) {
-        dayStates[day] = nextState[dayStates[day]];
-        fullRecalculate();
+    // --- MODAL LOGIC CON NAVEGACIÓN ---
+    function openModal(day) {
+        currentSelectedDay = day;
+        const year = parseInt(document.getElementById('selYear').value);
+        const month = parseInt(document.getElementById('selMonth').value);
+        
+        // 1. Títulos
+        const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+        document.getElementById('modalDateTitle').innerText = `Día ${day} de ${months[month-1]} ${year}`;
+        
+        // 2. Info Ley
+        const divisor = getDivisorForDate(year, month, day);
+        const salary = getRawMoney('baseSalary');
+        const hourValue = Math.round(salary / divisor);
+        document.getElementById('modalLawInfo').innerText = `Divisor ${divisor} horas | Valor Hora: ${formatMoney(hourValue)}`;
+
+        // 3. Preselección
+        const currentState = dayStates[day];
+        document.getElementById('modalShiftSelector').value = currentState;
+
+        // 4. Cálculos
+        updateModalCalculations(year, month, day, currentState);
+
+        // 5. Mostrar
+        document.getElementById('dayModal').style.display = 'flex';
     }
 
+    // FUNCIÓN DE NAVEGACIÓN (NUEVA)
+    function changeModalDay(offset) {
+        const year = parseInt(document.getElementById('selYear').value);
+        const month = parseInt(document.getElementById('selMonth').value);
+        const daysInMonth = new Date(year, month, 0).getDate();
+        
+        const newDay = currentSelectedDay + offset;
+
+        // Validar límites
+        if (newDay >= 1 && newDay <= daysInMonth) {
+            openModal(newDay);
+        }
+    }
+
+    function updateDayFromModal() {
+        const newState = document.getElementById('modalShiftSelector').value;
+        const year = parseInt(document.getElementById('selYear').value);
+        const month = parseInt(document.getElementById('selMonth').value);
+        
+        dayStates[currentSelectedDay] = newState;
+        updateModalCalculations(year, month, currentSelectedDay, newState);
+        renderGrid(year, month);
+        recalculate();
+    }
+
+    function updateModalCalculations(year, month, day, state) {
+        const comps = calculateDayComponents(state, year, month, day);
+        
+        document.getElementById('tdBasicVal').innerText = formatMoney(comps.basic);
+        document.getElementById('tdRecVal').innerText = formatMoney(comps.recargo);
+        document.getElementById('tdExtVal').innerText = formatMoney(comps.extra);
+        document.getElementById('tdTotalVal').innerText = formatMoney(comps.total);
+
+        const desc = getDescriptions(state);
+        document.getElementById('tdBasicDesc').innerText = desc.basic;
+        document.getElementById('tdRecDesc').innerText = desc.recargo;
+        document.getElementById('tdExtDesc').innerText = desc.extra;
+    }
+
+    function getDescriptions(state) {
+        switch(state) {
+            case 'D': return { basic: '8h Ordinarias', recargo: '0', extra: '4h Extras Diurnas (1.25)' };
+            case 'N': return { basic: '1h Diu + 7h Noc', recargo: '7h Recargo Noc (0.35)', extra: '4h Extra Noc (1.75)' };
+            case 'X': return { basic: '8h Pago Básico', recargo: '0', extra: '0' };
+            case 'E': return { basic: '8h Base', recargo: '8h Recargo Festivo', extra: '4h Extra Festiva' };
+            case 'P': return { basic: '8h Permiso Pago', recargo: '0', extra: '0' };
+            case 'A': return { basic: '0', recargo: '0', extra: '0' };
+            default: return { basic: '-', recargo: '-', extra: '-' };
+        }
+    }
+
+    function closeModal(event) {
+        if (!event || event.target.id === 'dayModal' || event.target.classList.contains('close-btn')) {
+            document.getElementById('dayModal').style.display = 'none';
+        }
+    }
+
+    // --- CÁLCULO DÍA A DÍA ---
     function calculateDayComponents(type, year, month, day) {
         const salary = getRawMoney('baseSalary');
         const divisor = getDivisorForDate(year, month, day);
@@ -480,7 +641,7 @@
         
         const year = document.getElementById('selYear').value;
         const month = document.getElementById('selMonth').options[document.getElementById('selMonth').selectedIndex].text;
-        const salary = document.getElementById('baseSalary').value; // Ya viene formateado
+        const salary = document.getElementById('baseSalary').value;
 
         doc.setFontSize(18);
         doc.text("Volante de N\u00F3mina", 105, 15, null, null, "center");
@@ -546,11 +707,6 @@
         });
 
         doc.save(`Nomina_${month}_${year}.pdf`);
-    }
-
-    function formatMoney(num) { 
-        if(typeof num === 'string') return num;
-        return '$ ' + Math.round(num).toLocaleString('es-CO'); 
     }
 </script>
 
