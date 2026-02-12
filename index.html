@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora N&oacute;mina Completa (Con Novedades)</title>
+    <title>Calculadora N&oacute;mina Completa (Con Extras/Festivos)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
@@ -12,12 +12,13 @@
             --primary: #2c3e50;
             --accent: #27ae60;
             --info: #17a2b8;
-            /* Colores de Estados */
-            --day-bg: #fff3cd; --day-text: #856404;       /* Diurno */
-            --night-bg: #d1ecf1; --night-text: #0c5460;   /* Nocturno */
-            --rest-bg: #d4edda; --rest-text: #155724;     /* Descanso */
-            --perm-bg: #e8daef; --perm-text: #6c3483;     /* Permiso (Morado) */
-            --abs-bg: #fadbd8; --abs-text: #922b21;       /* Ausencia (Rojo) */
+            /* Colores Estados */
+            --day-bg: #fff3cd; --day-text: #856404;
+            --night-bg: #d1ecf1; --night-text: #0c5460;
+            --rest-bg: #d4edda; --rest-text: #155724;
+            --perm-bg: #e8daef; --perm-text: #6c3483;
+            --abs-bg: #fadbd8; --abs-text: #922b21;
+            --extra-bg: #ffe0b2; --extra-text: #e65100; /* Naranja para Trabajo en Descanso */
         }
 
         body {
@@ -38,7 +39,7 @@
         }
 
         h1 { text-align: center; color: var(--primary); margin-bottom: 5px; }
-        .badge-new { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6em; vertical-align: middle; }
+        .badge-new { background: #e65100; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6em; vertical-align: middle; }
         p.subtitle { text-align: center; color: #666; margin-bottom: 30px; }
 
         .controls-panel {
@@ -82,16 +83,17 @@
         .day-cell:hover { background-color: #fdfdfd; box-shadow: inset 0 0 0 2px var(--accent); }
         .day-cell.empty { background: #f8f9fa; cursor: default; }
 
-        /* Clases de Estado */
+        /* Estados */
         .cell-diurno { background-color: var(--day-bg); color: var(--day-text); }
         .cell-nocturno { background-color: var(--night-bg); color: var(--night-text); }
         .cell-descanso { background-color: var(--rest-bg); color: var(--rest-text); }
         .cell-permiso { background-color: var(--perm-bg); color: var(--perm-text); }
         .cell-ausencia { background-color: var(--abs-bg); color: var(--abs-text); }
+        .cell-extra { background-color: var(--extra-bg); color: var(--extra-text); font-weight: bold; }
 
         .day-number { font-weight: bold; display: flex; justify-content: space-between; }
         .rate-indicator { font-size: 0.6em; background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px; }
-        .day-label { font-size: 0.75em; text-align: center; font-weight: bold; text-transform: uppercase; }
+        .day-label { font-size: 0.7em; text-align: center; font-weight: bold; text-transform: uppercase; }
         .day-money { font-size: 0.85em; text-align: right; font-weight: 700; }
 
         /* Resultados */
@@ -113,8 +115,6 @@
         
         .rates-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .rate-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; padding: 15px; transition: transform 0.2s;}
-        .rate-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-color: var(--accent); }
-        
         .rate-title { font-weight: bold; color: var(--primary); font-size: 1em; margin-bottom: 5px; display: flex; justify-content: space-between; }
         .rate-percentage { background: var(--info); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
         .rate-calc { font-size: 0.85em; color: #666; margin-bottom: 10px; font-style: italic; }
@@ -126,8 +126,8 @@
 <body>
 
 <div class="container">
-    <h1>Calculadora Vigilantes <span class="badge-new">NOVEDADES</span></h1>
-    <p class="subtitle">Incluye Permisos, Ausencias, PDF y Lógica Ley 2101</p>
+    <h1>Calculadora Vigilantes</h1>
+    <p class="subtitle">Incluye pago de domingos/descansos trabajados (con recargo de ley)</p>
 
     <div class="controls-panel">
         <div class="input-group">
@@ -171,7 +171,7 @@
     <div class="financial-summary">
         <div class="col-devengado">
             <div class="section-header">(+) DEVENGADO</div>
-            <div class="stat-row"><span>Valor Turnos (Bas + Rec + Ext)</span> <span id="valTotalTurnos">$ 0</span></div>
+            <div class="stat-row"><span>Valor Turnos + Recargos</span> <span id="valTotalTurnos">$ 0</span></div>
             <div class="stat-row"><span>Aux. Transporte</span> <span id="valTransporte">$ 0</span></div>
             <div class="stat-row total" style="color: var(--accent);"><span>TOTAL DEVENGADO</span> <span id="totalDevengado">$ 0</span></div>
         </div>
@@ -189,8 +189,8 @@
 
     <div class="education-section">
         <div class="education-header">
-            <h2>Gu&iacute;a de Tarifas y Novedades</h2>
-            <p>Calculado con divisor autom&aacute;tico seg&uacute;n fecha. Hora redondeada.</p>
+            <h2>Gu&iacute;a de Tarifas y Recargos</h2>
+            <p>Divisor autom&aacute;tico. Hora redondeada.</p>
         </div>
 
         <div class="formula-box">
@@ -200,38 +200,32 @@
         <div class="rates-grid">
             <div class="rate-card">
                 <div class="rate-title">Hora Ordinaria <span class="rate-percentage">1.0x</span></div>
-                <div class="rate-calc">Salario / Divisor</div>
                 <div class="rate-value" id="rate-ord">$ 0</div>
             </div>
             <div class="rate-card">
                 <div class="rate-title">Recargo Nocturno <span class="rate-percentage">0.35x</span></div>
-                <div class="rate-calc">Plus (7pm - 6am)</div>
                 <div class="rate-value" id="rate-rec-noc">$ 0</div>
             </div>
             <div class="rate-card">
                 <div class="rate-title">Extra Diurna <span class="rate-percentage">1.25x</span></div>
-                <div class="rate-calc">Hora Base + 25%</div>
                 <div class="rate-value" id="rate-ext-diu">$ 0</div>
             </div>
             <div class="rate-card">
                 <div class="rate-title">Extra Nocturna <span class="rate-percentage">1.75x</span></div>
-                <div class="rate-calc">Hora Base + 75%</div>
                 <div class="rate-value" id="rate-ext-noc">$ 0</div>
             </div>
-            <div class="rate-card">
-                <div class="rate-title">Dominical/Festivo <span class="rate-percentage">1.75x</span></div>
-                <div class="rate-calc">Recargo Festivo Ord.</div>
+            <div class="rate-card" style="border: 2px solid #e65100;">
+                <div class="rate-title">Extra/Dominical <span class="rate-percentage" style="background:#e65100;">1.8x / 1.9x</span></div>
+                <div class="rate-calc">Trabajo en día de descanso</div>
                 <div class="rate-value" id="rate-rec-dom">$ 0</div>
             </div>
              <div class="rate-card">
-                <div class="rate-title">Permiso Remun. <span class="rate-percentage" style="background:purple;">Pago</span></div>
-                <div class="rate-calc">Se paga como día básico</div>
-                <div class="rate-value" style="color:purple;">8 Horas</div>
+                <div class="rate-title">Extra Dom. Diurna <span class="rate-percentage">2.05x / 2.15x</span></div>
+                <div class="rate-value" id="rate-ext-dom-diu">$ 0</div>
             </div>
              <div class="rate-card">
-                <div class="rate-title">Ausencia No Just. <span class="rate-percentage" style="background:red;">$0</span></div>
-                <div class="rate-calc">No se paga el día</div>
-                <div class="rate-value" style="color:red;">$ 0</div>
+                <div class="rate-title">Extra Dom. Noct <span class="rate-percentage">2.55x / 2.65x</span></div>
+                <div class="rate-value" id="rate-ext-dom-noc">$ 0</div>
             </div>
         </div>
     </div>
@@ -245,6 +239,16 @@
         return (current >= transition) ? 210 : 220;
     }
 
+    // --- LÓGICA DE RECARGO FESTIVO ---
+    function getFestiveSurcharge(year, month, day) {
+        const current = new Date(year, month - 1, day).getTime();
+        const transition2026 = new Date(2026, 6, 1).getTime(); // 1 Julio 2026 sube al 90%
+        
+        // Antes de Julio 2026: 80% (0.8)
+        // Desde Julio 2026: 90% (0.9)
+        return (current >= transition2026) ? 0.90 : 0.80;
+    }
+
     // --- CONFIGURACIÓN ---
     const patterns = {
         '2D2N2X': ['D', 'D', 'N', 'N', 'X', 'X'],
@@ -254,13 +258,14 @@
     };
 
     let dayStates = [];
-    // SECUENCIA DE ESTADOS ACTUALIZADA: D -> N -> X -> P -> A -> D
-    const nextState = { 'D': 'N', 'N': 'X', 'X': 'P', 'P': 'A', 'A': 'D' };
+    // SECUENCIA ACTUALIZADA: D -> N -> X -> E (Extra/Descanso Trab) -> P -> A
+    const nextState = { 'D': 'N', 'N': 'X', 'X': 'E', 'E': 'P', 'P': 'A', 'A': 'D' };
     
     const stateConfig = {
         'D': { label: 'Diurno', class: 'cell-diurno' },
         'N': { label: 'Nocturno', class: 'cell-nocturno' },
         'X': { label: 'Descanso', class: 'cell-descanso' },
+        'E': { label: 'Trab. Descanso', class: 'cell-extra' }, // Nuevo
         'P': { label: 'Permiso', class: 'cell-permiso' },
         'A': { label: 'Ausencia', class: 'cell-ausencia' }
     };
@@ -345,44 +350,50 @@
         fullRecalculate();
     }
 
-    // --- CÁLCULO DÍA A DÍA CON NOVEDADES ---
     function calculateDayComponents(type, year, month, day) {
         const salary = parseFloat(document.getElementById('baseSalary').value) || 0;
         const divisor = getDivisorForDate(year, month, day);
         const hourValue = Math.round(salary / divisor);
+        const festSurcharge = getFestiveSurcharge(year, month, day); // 0.80 o 0.90
 
         let total = 0;
         let details = { basic: 0, recargo: 0, extra: 0 };
 
         switch(type) {
             case 'X': // Descanso
-            case 'P': // Permiso Remunerado
-                // Se pagan las 8 horas base del día
+            case 'P': // Permiso
                 total = 8 * hourValue; 
                 details.basic = total;
                 break;
-
-            case 'A': // Ausencia No Justificada
-                // No se paga nada
+            case 'A': // Ausencia
                 total = 0;
                 break;
-
-            case 'D': // Diurno 12h
-                const valOrd = 8 * hourValue;
-                const valExt = 4 * hourValue * 1.25;
-                total = valOrd + valExt;
-                details.basic = valOrd;
-                details.extra = valExt;
+            case 'D': // Diurno
+                total = (8 * hourValue) + (4 * hourValue * 1.25);
+                details.basic = 8 * hourValue;
+                details.extra = 4 * hourValue * 1.25;
                 break;
-
-            case 'N': // Nocturno 12h
-                const valOrdDiu = 1 * hourValue;
-                const valOrdNoc = 7 * hourValue * 1.35;
-                const valExtNoc = 4 * hourValue * 1.75;
-                total = valOrdDiu + valOrdNoc + valExtNoc;
-                details.basic = valOrdDiu + (7 * hourValue); 
-                details.recargo = (7 * hourValue * 0.35);    
-                details.extra = valExtNoc;
+            case 'N': // Nocturno
+                // 1h Diurna + 7h Nocturna (1.35) + 4h Extra Noct (1.75)
+                details.basic = (1 * hourValue) + (7 * hourValue);
+                details.recargo = (7 * hourValue * 0.35);
+                details.extra = (4 * hourValue * 1.75);
+                total = details.basic + details.recargo + details.extra;
+                break;
+            case 'E': // TRABAJO EN DESCANSO (FESTIVO) - 12H Diurno Asumido
+                // 8h con recargo festivo (1 + recargo)
+                // 4h extras festivas diurnas (1 + recargo + 0.25) = (1.25 + recargo)
+                // Ej 2026 Sem 1: 8h al 1.8 + 4h al 2.05 (1.25 + 0.80)
+                
+                const valBaseFest = 8 * hourValue * (1 + festSurcharge);
+                const valExtraFest = 4 * hourValue * (1.25 + festSurcharge);
+                
+                total = valBaseFest + valExtraFest;
+                
+                details.basic = 8 * hourValue; // Base pura
+                details.recargo = (8 * hourValue * festSurcharge); // El recargo de las 8h
+                // Las extras las sumamos completas al rubro extras para el reporte
+                details.extra = valExtraFest; 
                 break;
         }
         
@@ -422,16 +433,22 @@
         const [year, month] = monthInput.split('-').map(Number);
         const divisorRef = getDivisorForDate(year, month, 1);
         const hourVal = Math.round(salary / divisorRef); 
+        const festPct = getFestiveSurcharge(year, month, 1);
 
         document.getElementById('lblValorHora').innerText = formatMoney(hourVal) + ` (Base ${divisorRef}h)`;
         document.getElementById('rate-ord').innerText = formatMoney(hourVal);
         document.getElementById('rate-rec-noc').innerText = formatMoney(hourVal * 0.35);
         document.getElementById('rate-ext-diu').innerText = formatMoney(hourVal * 1.25);
         document.getElementById('rate-ext-noc').innerText = formatMoney(hourVal * 1.75);
-        document.getElementById('rate-rec-dom').innerText = formatMoney(hourVal * 1.75);
+        
+        // Dinámicos según fecha
+        document.getElementById('rate-rec-dom').innerText = formatMoney(hourVal * (1 + festPct));
+        document.getElementById('rate-ext-dom-diu').innerText = formatMoney(hourVal * (1.25 + festPct));
+        document.getElementById('rate-ext-dom-noc').innerText = formatMoney(hourVal * (1.75 + festPct));
     }
 
     function generatePDF() {
+        recalculate(); 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const monthInput = document.getElementById('selectedMonth').value;
@@ -439,7 +456,7 @@
         const salary = document.getElementById('baseSalary').value;
 
         doc.setFontSize(18);
-        doc.text("Reporte de N\u00F3mina (Con Novedades)", 105, 15, null, null, "center");
+        doc.text("Volante de N\u00F3mina", 105, 15, null, null, "center");
         doc.setFontSize(10);
         doc.text(`Periodo: ${monthInput} | Salario Base: ${formatMoney(salary)}`, 105, 22, null, null, "center");
 
@@ -459,8 +476,12 @@
                 ['Auxilio de Transporte', auxTrans, ''],
                 ['Aporte Salud (4%)', '', salud],
                 ['Aporte Pensi\u00F3n (4%)', '', pension],
-                [{content: 'TOTALES', styles: {fontStyle: 'bold'}}, totalDev, totalDed],
-                [{content: 'NETO A PAGAR', colSpan: 3, styles: {halign: 'center', fontSize: 14, fillColor: [44, 62, 80], textColor: 255}}, neto, '']
+                [
+                    {content: 'TOTALES', styles: {fontStyle: 'bold', fillColor: [240, 240, 240]}}, 
+                    {content: totalDev, styles: {fontStyle: 'bold', fillColor: [240, 240, 240], halign: 'right'}}, 
+                    {content: totalDed, styles: {fontStyle: 'bold', fillColor: [240, 240, 240], halign: 'right'}}
+                ],
+                [{content: 'NETO A PAGAR: ' + neto, colSpan: 3, styles: {halign: 'center', fontSize: 14, fillColor: [44, 62, 80], textColor: 255}}]
             ],
             theme: 'grid',
             headStyles: { fillColor: [44, 62, 80] },
@@ -468,7 +489,7 @@
         });
 
         let rows = [];
-        const stateLabels = { 'D': 'Diurno', 'N': 'Nocturno', 'X': 'Descanso', 'P': 'Permiso', 'A': 'Ausencia' };
+        const stateLabels = { 'D': 'Diurno', 'N': 'Nocturno', 'X': 'Descanso', 'E': 'Trab. Extra', 'P': 'Permiso', 'A': 'Ausencia' };
         
         for (let day = 1; day < dayStates.length; day++) {
             const state = dayStates[day];
@@ -486,7 +507,7 @@
             ]);
         }
 
-        doc.text("Detalle Diario de Asistencia", 14, doc.lastAutoTable.finalY + 10);
+        doc.text("Detalle de Asistencia", 14, doc.lastAutoTable.finalY + 10);
 
         doc.autoTable({
             startY: doc.lastAutoTable.finalY + 15,
@@ -498,7 +519,7 @@
             columnStyles: { 0: { halign: 'center' }, 1: { halign: 'left' } }
         });
 
-        doc.save(`Nomina_Novedades_${monthInput}.pdf`);
+        doc.save(`Nomina_Final_${monthInput}.pdf`);
     }
 
     function formatMoney(num) { 
@@ -508,5 +529,4 @@
 </script>
 
 </body>
-
 </html>
